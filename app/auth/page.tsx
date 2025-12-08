@@ -1,14 +1,15 @@
 "use client";
 
+import { FormEvent, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const supabase = createClient();
@@ -32,6 +33,11 @@ export default function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              gender: gender,
+            },
+          },
         });
 
         if (error) throw error;
@@ -100,13 +106,37 @@ export default function AuthPage() {
               placeholder="Enter your password"
               className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-800 dark:text-white"
             />
-
-            {error && (
-              <div className="text-red-600 dark:text-red-400 text-sm">
-                {error}
-              </div>
-            )}
           </div>
+
+          {isSignUp && (
+            <div>
+              <label
+                htmlFor="gender"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                Gender
+              </label>
+              <select
+                id="gender"
+                required
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-800 dark:text-white"
+              >
+                <option value="">Select your gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
+              </select>
+            </div>
+          )}
+
+          {error && (
+            <div className="text-red-600 dark:text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={loading}
@@ -120,7 +150,7 @@ export default function AuthPage() {
           <button onClick={() => setIsSignUp(!isSignUp)}>
             {isSignUp
               ? "Already have an account? Sign In"
-              : "Dont't have an account? Sign Up"}
+              : "Don't have an account? Sign Up"}
           </button>
         </div>
       </div>
