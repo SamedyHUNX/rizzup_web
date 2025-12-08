@@ -2,7 +2,6 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { error } from "console";
 import {
   createContext,
   ReactNode,
@@ -55,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function signOut() {
     try {
       await supabase.auth.signOut();
-    } catch {
+    } catch (error: any) {
       console.error("Error signing out: ", error);
     }
   }
