@@ -31,7 +31,7 @@ body {
   }
 
   .match-button {
-    @apply bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-200;
+    @apply bg-linear-to-r from-pink-500 to-red-500 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-200;
   }
 
   .chat-container {
