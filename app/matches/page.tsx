@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getPotentialMatches } from "@/lib/actions/matches";
+import { getPotentialMatches, likeUser } from "@/lib/actions/matches";
 import { UserProfile } from "../profile/page";
 import { useRouter } from "next/navigation";
 import MatchCard from "@/components/match-card";
 import MatchButtons from "@/components/match-buttons";
+import MatchNotification from "@/components/match-notification";
 // import MatchCard from "@/components/MatchCard";
 // import MatchButtons from "@/components/MatchButtons";
 // import MatchNotification from "@/components/MatchNotification";
@@ -36,19 +37,20 @@ export default function MatchesPage() {
   }, []);
 
   async function handleLike() {
-    // if (currentIndex < potentialMatches.length) {
-    //   const likedUser = potentialMatches[currentIndex];
-    //   try {
-    //     const result = await likeUser(likedUser.id);
-    //     if (result.isMatch) {
-    //       setMatchedUser(result.matchedUser!);
-    //       setShowMatchNotification(true);
-    //     }
-    //     setCurrentIndex((prev) => prev + 1);
-    //   } catch (err) {
-    //     console.error(err);
-    //   }
-    // }
+    if (currentIndex < potentialMatches.length) {
+      const likedUser = potentialMatches[currentIndex];
+      try {
+        const result = await likeUser(likedUser.id);
+        if (result.isMatch) {
+          setMatchedUser(result.matchedUser!);
+          setShowMatchNotification(true);
+        }
+        // Move to the next profile
+        setCurrentIndex((prev) => prev + 1);
+      } catch (err) {
+        console.error(err);
+      }
+    }
   }
 
   function handlePass() {
@@ -94,13 +96,13 @@ export default function MatchesPage() {
             Refresh
           </button>
         </div>
-        {/* {showMatchNotification && matchedUser && (
+        {showMatchNotification && matchedUser && (
           <MatchNotification
             match={matchedUser}
             onClose={handleCloseMatchNotification}
             onStartChat={handleStartChat}
           />
-        )} */}
+        )}
       </div>
     );
   }
@@ -151,13 +153,13 @@ export default function MatchesPage() {
           </div>
         </div>
 
-        {/* {showMatchNotification && matchedUser && (
+        {showMatchNotification && matchedUser && (
           <MatchNotification
             match={matchedUser}
             onClose={handleCloseMatchNotification}
             onStartChat={handleStartChat}
           />
-        )} */}
+        )}
       </div>
     </div>
   );
