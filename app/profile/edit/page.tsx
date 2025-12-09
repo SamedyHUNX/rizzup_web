@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import {
   getCurrentUserProfile,
   updateUserProfile,
@@ -70,7 +70,7 @@ export default function EditProfilePage() {
   }
 
   function handleInputChange(
-    e: React.ChangeEvent<
+    e: ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) {
