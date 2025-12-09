@@ -4,6 +4,7 @@ import { getPotentialMatches } from "@/lib/actions/matches";
 import { UserProfile } from "../profile/page";
 import { useRouter } from "next/navigation";
 import MatchCard from "@/components/match-card";
+import MatchButtons from "@/components/match-buttons";
 // import MatchCard from "@/components/MatchCard";
 // import MatchButtons from "@/components/MatchButtons";
 // import MatchNotification from "@/components/MatchNotification";
@@ -145,9 +146,9 @@ export default function MatchesPage() {
 
         <div className="max-w-md mx-auto">
           <MatchCard user={currentPotentialMatch} />
-          {/* <div className="mt-8">
+          <div className="mt-8">
             <MatchButtons onLike={handleLike} onPass={handlePass} />
-          </div> */}
+          </div>
         </div>
 
         {/* {showMatchNotification && matchedUser && (
