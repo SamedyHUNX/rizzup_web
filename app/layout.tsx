@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
 import { ReactNode } from "react";
 import Navbar from "@/components/navbar";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
           <div className="h-full flex flex-col">
             <Navbar />
             {children}
+            <Toaster richColors position="top-right" />
           </div>
         </AuthProvider>
       </body>

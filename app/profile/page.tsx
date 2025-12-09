@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getCurrentUserProfile } from "@/lib/actions/profile";
 import { calculateAge } from "@/lib/helpers/calculate-age";
+import { toast } from "sonner";
 
 export interface UserProfile {
   id: string;
@@ -58,6 +59,10 @@ export default function ProfilePage() {
     loadProfile();
   }, []);
 
+  if (error) {
+    toast.error(error);
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
@@ -71,7 +76,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (error || !profile) {
+  if (!profile) {
     return (
       <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-8">
