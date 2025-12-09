@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import {
   getCurrentUserProfile,
   updateUserProfile,
@@ -47,11 +47,13 @@ export default function EditProfilePage() {
     loadProfile();
   }, []);
 
-  async function handleFormSubmit(e: React.FormEvent) {
+  async function handleFormSubmit(e: FormEvent) {
     e.preventDefault();
 
     setSaving(true);
     setError(null);
+
+    console.log("Submitting form data:", formData);
 
     try {
       const result = await updateUserProfile(formData);
@@ -120,14 +122,20 @@ export default function EditProfilePage() {
                       src={formData.avatar_url || "/default-avatar.png"}
                       alt="Profile"
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error("Error loading image:", formData.avatar_url);
+                        e.currentTarget.src = "/default-avatar.png";
+                      }}
                     />
                   </div>
                   <PhotoUpload
                     onPhotoUploaded={(url) => {
+                      console.log("Page received new avatar URL:", url);
                       setFormData((prev) => ({
                         ...prev,
                         avatar_url: url,
                       }));
+                      router.refresh();
                     }}
                   />
                 </div>

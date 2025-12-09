@@ -11,7 +11,7 @@ export interface UserProfile {
   full_name: string;
   username: string;
   email: string;
-  gender: "male" | "female" | "other";
+  gender: "male" | "female" | "other" | "non-binary";
   birthdate: string;
   bio: string;
   avatar_url: string;

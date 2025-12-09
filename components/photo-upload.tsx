@@ -1,7 +1,7 @@
 "use client";
 
 import { uploadProfilePhoto } from "@/lib/actions/profile";
-import { useRef, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 
 export default function PhotoUpload({
   onPhotoUploaded,
@@ -12,7 +12,7 @@ export default function PhotoUpload({
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  async function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileSelect(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -30,7 +30,12 @@ export default function PhotoUpload({
     setError(null);
 
     try {
-      const result = await uploadProfilePhoto(file);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const result = await uploadProfilePhoto(formData);
+      console.log("Upload result:", result);
+
       if (result.success && result.url) {
         onPhotoUploaded(result.url);
         setError(null);
@@ -55,7 +60,11 @@ export default function PhotoUpload({
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={handleFileSelect}
+        onChange={(e) => {
+          handleFileSelect(e);
+          // Reset input value to allow selecting the same file again
+          e.target.value = "";
+        }}
       />
       <button
         type="button"
