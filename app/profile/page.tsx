@@ -30,7 +30,7 @@ export interface UserPreferences {
     max: number;
   };
   distance: number;
-  gender_preference: ("male" | "female" | "other")[];
+  gender_preference: ("male" | "female" | "other" | "non-binary")[];
 }
 
 export default function ProfilePage() {

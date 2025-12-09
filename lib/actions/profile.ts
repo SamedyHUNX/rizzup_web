@@ -3,15 +3,12 @@
 import { createClient } from "../supabase/server";
 
 export async function getCurrentUserProfile() {
-  console.log("getCurrentUserProfile: Starting...");
   const supabase = await createClient();
 
   const {
     data: { user },
     error: authError,
   } = await supabase.auth.getUser();
-
-  console.log("getCurrentUserProfile: Auth user result:", { user, authError });
 
   if (!user) {
     console.log("getCurrentUserProfile: No user found");
