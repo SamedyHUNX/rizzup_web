@@ -5,6 +5,7 @@ import { getUserMatches } from "@/lib/actions/matches";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { calculateAge } from "@/lib/helpers/calculate-age";
+import { toast } from "sonner";
 
 export default function MatchesListPage() {
   const [matches, setMatches] = useState<UserProfile[]>([]);
@@ -14,9 +15,9 @@ export default function MatchesListPage() {
   useEffect(() => {
     async function loadMatches() {
       try {
+        setError(null);
         const userMatches = await getUserMatches();
         setMatches(userMatches);
-        console.log(userMatches);
       } catch (error) {
         setError("Failed to load matches.");
       } finally {
@@ -26,6 +27,10 @@ export default function MatchesListPage() {
 
     loadMatches();
   }, []);
+
+  if (error) {
+    toast.error(error);
+  }
 
   if (loading) {
     return (
