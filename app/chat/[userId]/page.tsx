@@ -1,11 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { UserProfile } from "@/app/profile/page";
 import ChatHeader from "@/components/chat-header";
 import { useAuth } from "@/contexts/auth-context";
 import { getUserMatches } from "@/lib/actions/matches";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import StreamChatInterface from "@/components/stream-chat-interface";
 
 export default function ChatConversationPage() {
   const [otherUser, setOtherUser] = useState<UserProfile | null>(null);
@@ -56,9 +57,9 @@ export default function ChatConversationPage() {
 
   if (!otherUser) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-8">
-          <div className="w-24 h-24 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-24 h-24 bg-linear-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-4xl">❌</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
@@ -70,7 +71,7 @@ export default function ChatConversationPage() {
           </p>
           <button
             onClick={() => router.push("/chat")}
-            className="bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold py-3 px-6 rounded-full hover:from-pink-600 hover:to-red-600 transition-all duration-200"
+            className="bg-linear-to-r from-pink-500 to-red-500 text-white font-semibold py-3 px-6 rounded-full hover:from-pink-600 hover:to-red-600 transition-all duration-200"
           >
             Back to Messages
           </button>
@@ -83,6 +84,10 @@ export default function ChatConversationPage() {
     <div className="h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-4xl mx-auto h-full flex flex-col">
         <ChatHeader user={otherUser} onVideoCall={() => {}} />
+
+        <div className="flex-1 min-h-0">
+          <StreamChatInterface otherUser={otherUser} />
+        </div>
       </div>
     </div>
   );

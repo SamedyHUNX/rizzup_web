@@ -1,0 +1,200 @@
+"use client";
+
+import { FormEvent, useEffect, useState } from "react";
+import { UserProfile } from "@/app/profile/page";
+import { createOrGetChannel, getStreamUserToken } from "@/lib/actions/stream";
+import { useRouter } from "next/navigation";
+import { Channel, StreamChat } from "stream-chat";
+import { toast } from "sonner";
+
+interface Message {
+  id: string;
+  text: string;
+  sender: "me" | "other";
+  timestamp: Date;
+  user_id: string;
+}
+
+export default function StreamChatInterface({
+  otherUser,
+}: {
+  otherUser: UserProfile;
+}) {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string>("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState<string>("");
+  const router = useRouter();
+
+  const [client, setClient] = useState<StreamChat | null>(null);
+  const [channel, setChannel] = useState<Channel | null>(null);
+
+  useEffect(() => {
+    let chatClient: StreamChat;
+
+    async function initializeChat() {
+      try {
+        setError(null);
+
+        const { token, userId, userName, userImage } =
+          await getStreamUserToken();
+        setCurrentUserId(userId!);
+
+        chatClient = StreamChat.getInstance(
+          process.env.NEXT_PUBLIC_STREAM_API_KEY!
+        );
+
+        // Only connect if not already connected or connected as a different user
+        if (chatClient.userID !== userId) {
+          await chatClient.connectUser(
+            {
+              id: userId!,
+              name: userName,
+              image: userImage,
+            },
+            token
+          );
+        }
+
+        setClient(chatClient);
+
+        const { channelId, channelType } = await createOrGetChannel(
+          otherUser.id
+        );
+
+        // Get the channel
+        const chatChannel = chatClient.channel(channelType!, channelId);
+        await chatChannel.watch();
+
+        // Load existing messages
+        const state = await chatChannel.query({ messages: { limit: 50 } });
+
+        // Convert stream messages to our format
+        const convertedMessages: Message[] = state.messages.map((msg) => ({
+          id: msg.id,
+          text: msg.text || "",
+          sender: msg.user?.id === userId ? "me" : "other",
+          timestamp: new Date(msg.created_at || new Date()),
+          user_id: msg.user?.id || "",
+        }));
+
+        setMessages(convertedMessages);
+        setChannel(chatChannel);
+      } catch (error) {
+        console.error("Chat initialization error:", error);
+        // Don't redirect immediately on error to avoid loops, just show error state
+        setError("Failed to connect to chat");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (otherUser) {
+      initializeChat();
+    }
+
+    return () => {
+      if (chatClient) {
+        // We don't necessarily want to disconnect the user on every unmount
+        // as it might be expensive. But we should stop watching the channel.
+        // For now, we'll leave the user connected as Stream handles singleton behavior.
+        // If we needed to strictly disconnect:
+        // chatClient.disconnectUser();
+      }
+    };
+  }, [otherUser]);
+
+  if (!client || !channel) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-white dark:bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Setting up chat...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  async function handleSendMessage(e: FormEvent) {
+    e.preventDefault();
+    if (newMessage.trim() && channel) {
+      try {
+        const response = await channel.sendMessage({
+          text: newMessage.trim(),
+        });
+
+        const message: Message = {
+          id: response.message.id,
+          text: newMessage.trim(),
+          sender: "me",
+          timestamp: new Date(),
+          user_id: currentUserId,
+        };
+
+        setMessages((prev) => {
+          const messageExists = prev.some((msg) => msg.id === message.id);
+
+          if (!messageExists) {
+            return [...prev, message];
+          }
+          return prev;
+        });
+
+        setNewMessage("");
+      } catch (error: any) {
+        toast.error(error);
+        console.error("Error sending message: ", error);
+      }
+    }
+  }
+
+  return (
+    <div className="h-full flex flex-col bg-white dark:bg-gray-900">
+      <div
+        className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth chat-scrollbar relative"
+        style={{ scrollBehavior: "smooth" }}
+      >
+        {messages.map((message, key) => (
+          <div key={key}>{message.text}</div>
+        ))}
+      </div>
+
+      {/* Message Input */}
+      <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+        <form className="flex space-x-2" onSubmit={handleSendMessage}>
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message..."
+            disabled={!channel}
+            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+          />
+
+          <button
+            type="submit"
+            disabled={!newMessage.trim() || !channel}
+            className="px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full hover:from-pink-600 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 12h14m-7-7l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
