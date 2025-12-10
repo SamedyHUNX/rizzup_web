@@ -115,7 +115,7 @@ export default function VideoCall({
           <p className="text-gray-300 mb-4">{error}</p>
           <button
             onClick={onCallEnd}
-            className="bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold py-3 px-6 rounded-full hover:from-pink-600 hover:to-red-600 transition-all duration-200"
+            className="bg-linear-to-r from-pink-500 to-red-500 text-white font-semibold py-3 px-6 rounded-full hover:from-pink-600 hover:to-red-600 transition-all duration-200"
           >
             Close
           </button>
