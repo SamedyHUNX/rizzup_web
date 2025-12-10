@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { UserProfile } from "../profile/page";
 import Link from "next/link";
 
-interface ChatData {
+export interface ChatData {
   id: string;
   user: UserProfile;
   lastMessage?: string;
