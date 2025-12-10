@@ -1,12 +1,10 @@
-"use client";
-
-import { FormEvent, useEffect, useState } from "react";
-import { useAuth } from "@/contexts/auth-context";
+import { useState, useEffect, FormEvent } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
 
-export default function AuthPage() {
-  const [isSignUp, setIsSignUp] = useState<boolean>(false);
+export default function SignUpPage() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [gender, setGender] = useState<string>("");
@@ -22,35 +20,26 @@ export default function AuthPage() {
     }
   }, [user, authLoading, router]);
 
-  async function handleAuth(e: FormEvent) {
+  async function handleSignUp(e: FormEvent) {
     e.preventDefault();
-
     setLoading(true);
     setError("");
 
     try {
-      if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              gender: gender,
-            },
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            gender: gender,
           },
-        });
+        },
+      });
 
-        if (error) throw error;
-        if (data.user && data.session) {
-          setError("Please check your email for a confirmation link");
-          return;
-        }
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
+      if (error) throw error;
+      if (data.user && data.session) {
+        setError("Please check your email for a confirmation link");
+        return;
       }
     } catch (error: any) {
       setError(error.message);
@@ -67,11 +56,11 @@ export default function AuthPage() {
             RizzUp
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {isSignUp ? "Create Your Account" : "Sign in to your account"}
+            Create Your Account
           </p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleAuth}>
+        <form className="space-y-6" onSubmit={handleSignUp}>
           <div>
             <label
               htmlFor="email"
@@ -108,28 +97,26 @@ export default function AuthPage() {
             />
           </div>
 
-          {isSignUp && (
-            <div>
-              <label
-                htmlFor="gender"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Gender
-              </label>
-              <select
-                id="gender"
-                required
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-800 dark:text-white"
-              >
-                <option value="">Select your gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="prefer-not-to-say">Prefer not to say</option>
-              </select>
-            </div>
-          )}
+          <div>
+            <label
+              htmlFor="gender"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Gender
+            </label>
+            <select
+              id="gender"
+              required
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-800 dark:text-white"
+            >
+              <option value="">Select your gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="prefer-not-to-say">Prefer not to say</option>
+            </select>
+          </div>
 
           {error && (
             <div className="text-red-600 dark:text-red-400 text-sm">
@@ -142,16 +129,17 @@ export default function AuthPage() {
             disabled={loading}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-linear-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50"
           >
-            {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
+            {loading ? "Loading..." : "Sign Up"}
           </button>
         </form>
 
         <div className="text-center">
-          <button onClick={() => setIsSignUp(!isSignUp)}>
-            {isSignUp
-              ? "Already have an account? Sign In"
-              : "Don't have an account? Sign Up"}
-          </button>
+          <Link
+            href="/signin"
+            className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300"
+          >
+            Already have an account? Sign In
+          </Link>
         </div>
       </div>
     </div>

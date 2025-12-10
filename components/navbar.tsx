@@ -67,7 +67,7 @@ export default function Navbar() {
             </button>
           ) : (
             <Link
-              href="/auth"
+              href="/auth/sign-in"
               className="inline-flex items-center px-4 py-2 bg-linear-to-r from-pink-500 to-red-500 text-white text-sm font-medium rounded-lg hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
             >
               Sign In
