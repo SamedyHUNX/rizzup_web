@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { UserProfile } from "@/app/profile/page";
 import { createOrGetChannel, getStreamUserToken } from "@/lib/actions/stream";
 import { useRouter } from "next/navigation";
@@ -29,6 +29,17 @@ export default function StreamChatInterface({
 
   const [client, setClient] = useState<StreamChat | null>(null);
   const [channel, setChannel] = useState<Channel | null>(null);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  function scrollToBottom() {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     let chatClient: StreamChat;
@@ -214,6 +225,8 @@ export default function StreamChatInterface({
             </div>
           </div>
         ))}
+
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Message Input */}
