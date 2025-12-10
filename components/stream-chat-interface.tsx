@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { UserProfile } from "@/app/profile/page";
 import { createOrGetChannel, getStreamUserToken } from "@/lib/actions/stream";
 import { useRouter } from "next/navigation";
-import { Channel, StreamChat } from "stream-chat";
+import { Channel, Event, StreamChat } from "stream-chat";
 import { toast } from "sonner";
 
 interface Message {
@@ -80,6 +80,32 @@ export default function StreamChatInterface({
         }));
 
         setMessages(convertedMessages);
+
+        chatChannel.on("message.new", (event: Event) => {
+          if (event.message) {
+            if (event.message.user?.id !== userId) {
+              const newMessage: Message = {
+                id: event.message.id,
+                text: event.message.text || "",
+                sender: "other",
+                timestamp: new Date(event.message.created_at || new Date()),
+                user_id: event.message.user?.id || "",
+              };
+
+              setMessages((prev) => {
+                const messageExists = prev.some(
+                  (msg) => msg.id === newMessage.id
+                );
+                if (!messageExists) {
+                  return [...prev, newMessage];
+                }
+                return prev;
+              });
+            }
+          }
+        });
+
+        setClient(chatClient);
         setChannel(chatChannel);
       } catch (error) {
         console.error("Chat initialization error:", error);
@@ -100,7 +126,7 @@ export default function StreamChatInterface({
         // as it might be expensive. But we should stop watching the channel.
         // For now, we'll leave the user connected as Stream handles singleton behavior.
         // If we needed to strictly disconnect:
-        // chatClient.disconnectUser();
+        chatClient.disconnectUser();
       }
     };
   }, [otherUser]);
@@ -116,6 +142,10 @@ export default function StreamChatInterface({
         </div>
       </div>
     );
+  }
+
+  function formatTime(date: Date) {
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   }
 
   async function handleSendMessage(e: FormEvent) {
@@ -158,7 +188,31 @@ export default function StreamChatInterface({
         style={{ scrollBehavior: "smooth" }}
       >
         {messages.map((message, key) => (
-          <div key={key}>{message.text}</div>
+          <div
+            key={key}
+            className={`flex ${
+              message.sender === "me" ? "justify-end" : "justify-start"
+            }`}
+          >
+            <div
+              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+                message.sender === "me"
+                  ? "bg-linear-to-r from-pink-500 to-red-500 text-white"
+                  : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white"
+              }`}
+            >
+              <p className="text-s">{message.text}</p>
+              <p
+                className={`text-xs mt-1 ${
+                  message.sender === "me"
+                    ? "text-pink-100"
+                    : "text-gray-500 dark:text-gray-400"
+                }`}
+              >
+                {formatTime(message.timestamp)}
+              </p>
+            </div>
+          </div>
         ))}
       </div>
 
@@ -177,7 +231,7 @@ export default function StreamChatInterface({
           <button
             type="submit"
             disabled={!newMessage.trim() || !channel}
-            className="px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full hover:from-pink-600 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="px-6 py-2 bg-linear-to-r from-pink-500 to-red-500 text-white rounded-full hover:from-pink-600 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           >
             <svg
               className="w-5 h-5"
