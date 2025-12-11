@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import Link from "next/link";
+import ThemeToggle from "./theme-toggle";
 
 export default function Navbar() {
   const { signOut, user } = useAuth();
@@ -15,7 +16,6 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* Only show navigation links if user is authenticated */}
           {user && (
             <div className="hidden md:flex items-center space-x-8">
               <Link
@@ -66,12 +66,15 @@ export default function Navbar() {
               Sign Out
             </button>
           ) : (
-            <Link
-              href="/auth/sign-in"
-              className="inline-flex items-center px-4 py-2 bg-linear-to-r from-pink-500 to-red-500 text-white text-sm font-medium rounded-lg hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
-            >
-              Sign In
-            </Link>
+            <div className="flex justify-between gap-3">
+              <ThemeToggle />
+              <Link
+                href="/auth/sign-in"
+                className="inline-flex items-center px-4 py-2 bg-linear-to-r from-pink-500 to-red-500 text-white text-sm font-medium rounded-lg hover:from-pink-600 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+              >
+                Sign In
+              </Link>
+            </div>
           )}
         </div>
       </div>
