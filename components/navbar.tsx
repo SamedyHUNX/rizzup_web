@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/auth-context";
 import Link from "next/link";
 import ThemeToggle from "./theme-toggle";
 import { Button } from "./ui/button";
+import { Label } from "./ui/label";
 
 export default function Navbar() {
   const { signOut, user } = useAuth();
@@ -13,9 +14,9 @@ export default function Navbar() {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center space-x-3">
-            <span className="text-xl font-bold bg-linear-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-200 bg-clip-text text-transparent">
+            <Label className="text-xl font-bold bg-linear-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-200 bg-clip-text text-transparent">
               RizzUp
-            </span>
+            </Label>
           </Link>
 
           {user && (
