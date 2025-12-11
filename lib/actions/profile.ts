@@ -29,7 +29,6 @@ export async function getCurrentUserProfile() {
 }
 
 export async function updateUserProfile(profileData: Partial<UserProfile>) {
-  console.log("updateUserProfile called with:", profileData);
   const supabase = await createClient();
 
   const {
@@ -64,7 +63,6 @@ export async function updateUserProfile(profileData: Partial<UserProfile>) {
 export async function uploadProfilePhoto(formData: FormData) {
   const supabase = await createClient();
   const file = formData.get("file") as File;
-
 
   if (!file) {
     return { success: false, error: "No file provided" };

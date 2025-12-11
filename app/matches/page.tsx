@@ -1,14 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
 import { getPotentialMatches, likeUser } from "@/lib/actions/matches";
+import { useEffect, useState } from "react";
 import { UserProfile } from "../profile/page";
 import { useRouter } from "next/navigation";
+import MatchNotification from "@/components/match-notification";
 import MatchCard from "@/components/match-card";
 import MatchButtons from "@/components/match-buttons";
-import MatchNotification from "@/components/match-notification";
-// import MatchCard from "@/components/MatchCard";
-// import MatchButtons from "@/components/MatchButtons";
-// import MatchNotification from "@/components/MatchNotification";
 
 export default function MatchesPage() {
   const [potentialMatches, setPotentialMatches] = useState<UserProfile[]>([]);
@@ -25,7 +22,6 @@ export default function MatchesPage() {
       try {
         const potentialMatchesData = await getPotentialMatches();
         setPotentialMatches(potentialMatchesData);
-        console.log(potentialMatches);
       } catch (error) {
         console.error(error);
       } finally {
@@ -39,13 +35,15 @@ export default function MatchesPage() {
   async function handleLike() {
     if (currentIndex < potentialMatches.length) {
       const likedUser = potentialMatches[currentIndex];
+
       try {
         const result = await likeUser(likedUser.id);
+
         if (result.isMatch) {
           setMatchedUser(result.matchedUser!);
           setShowMatchNotification(true);
         }
-        // Move to the next profile
+
         setCurrentIndex((prev) => prev + 1);
       } catch (err) {
         console.error(err);

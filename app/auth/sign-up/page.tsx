@@ -1,8 +1,11 @@
+"use client";
+
 import { useState, useEffect, FormEvent } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState<string>("");
@@ -36,7 +39,10 @@ export default function SignUpPage() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        setError(error.message);
+        return;
+      }
       if (data.user && data.session) {
         setError("Please check your email for a confirmation link");
         return;
@@ -47,6 +53,12 @@ export default function SignUpPage() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-pink-100 to-red-100 dark:from-gray-900 dark:to-gray-800">
@@ -114,15 +126,10 @@ export default function SignUpPage() {
               <option value="">Select your gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
-              <option value="prefer-not-to-say">Prefer not to say</option>
+              <option value="non-binary">Non-binary</option>
+              <option value="other">Other</option>
             </select>
           </div>
-
-          {error && (
-            <div className="text-red-600 dark:text-red-400 text-sm">
-              {error}
-            </div>
-          )}
 
           <button
             type="submit"
@@ -133,12 +140,13 @@ export default function SignUpPage() {
           </button>
         </form>
 
-        <div className="text-center">
+        <div className="text-center flex justify-center">
+          <p>Already have an account?</p>
           <Link
-            href="/signin"
+            href="/auth/sign-in"
             className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300"
           >
-            Already have an account? Sign In
+            {" Sign In"}
           </Link>
         </div>
       </div>

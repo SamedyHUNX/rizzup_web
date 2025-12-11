@@ -53,8 +53,6 @@ export default function EditProfilePage() {
     setSaving(true);
     setError(null);
 
-    console.log("Submitting form data:", formData);
-
     try {
       const result = await updateUserProfile(formData);
       if (result.success) {
@@ -70,9 +68,7 @@ export default function EditProfilePage() {
   }
 
   function handleInputChange(
-    e: ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -123,7 +119,10 @@ export default function EditProfilePage() {
                       alt="Profile"
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        console.error("Error loading image:", formData.avatar_url);
+                        console.error(
+                          "Error loading image:",
+                          formData.avatar_url
+                        );
                         e.currentTarget.src = "/default-avatar.png";
                       }}
                     />
@@ -210,6 +209,7 @@ export default function EditProfilePage() {
                 >
                   <option value="male">Male</option>
                   <option value="female">Female</option>
+                  <option value="non-binary">Non-binary</option>
                   <option value="other">Other</option>
                 </select>
               </div>

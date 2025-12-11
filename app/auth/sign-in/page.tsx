@@ -1,8 +1,11 @@
+"use client";
+
 import { useState, useEffect, FormEvent } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function SignInPage() {
   const [email, setEmail] = useState<string>("");
@@ -29,13 +32,21 @@ export default function SignInPage() {
         email,
         password,
       });
-      if (error) throw error;
+      if (error) {
+        setError(error.message);
+      }
     } catch (error: any) {
       setError(error.message);
     } finally {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-pink-100 to-red-100 dark:from-gray-900 dark:to-gray-800">
@@ -86,12 +97,6 @@ export default function SignInPage() {
             />
           </div>
 
-          {error && (
-            <div className="text-red-600 dark:text-red-400 text-sm">
-              {error}
-            </div>
-          )}
-
           <button
             type="submit"
             disabled={loading}
@@ -103,7 +108,7 @@ export default function SignInPage() {
 
         <div className="text-center">
           <Link
-            href="/signup"
+            href="/auth/sign-up"
             className="text-pink-600 dark:text-pink-400 hover:text-pink-700 dark:hover:text-pink-300"
           >
             Don't have an account? Sign Up
