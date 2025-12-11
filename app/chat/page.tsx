@@ -4,6 +4,9 @@ import { getUserMatches } from "@/lib/actions/matches";
 import { useEffect, useState } from "react";
 import { UserProfile } from "../profile/page";
 import Link from "next/link";
+import { formatTime } from "@/lib/helpers/format-time";
+import Loading from "@/components/loading";
+import { toast } from "sonner";
 
 export interface ChatData {
   id: string;
@@ -16,10 +19,12 @@ export interface ChatData {
 export default function ChatPage() {
   const [chats, setChats] = useState<ChatData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     async function loadMatches() {
       try {
+        setError("");
         const userMatches = await getUserMatches();
         const chatData: ChatData[] = userMatches.map((match) => ({
           id: match.id,
@@ -29,8 +34,8 @@ export default function ChatPage() {
           unreadCount: 0,
         }));
         setChats(chatData);
-        console.log(userMatches);
-      } catch (error) {
+      } catch (error: any) {
+        setError(error.message);
         console.error(error);
       } finally {
         setLoading(false);
@@ -40,36 +45,14 @@ export default function ChatPage() {
     loadMatches();
   }, []);
 
-  function formatTime(timestamp: string) {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-
-    if (diffInHours < 1) {
-      return "Just now";
-    } else if (diffInHours < 24) {
-      return date.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } else if (diffInHours < 48) {
-      return "Yesterday";
-    } else {
-      return date.toLocaleDateString();
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
     }
-  }
+  }, [error]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Loading your matches...
-          </p>
-        </div>
-      </div>
-    );
+    return <Loading message="Loading your matches..." />;
   }
 
   return (

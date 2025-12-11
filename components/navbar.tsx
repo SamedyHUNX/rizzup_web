@@ -3,9 +3,11 @@
 import { useAuth } from "@/contexts/auth-context";
 import Link from "next/link";
 import ThemeToggle from "./theme-toggle";
+import { Button } from "./ui/button";
 
 export default function Navbar() {
   const { signOut, user } = useAuth();
+
   return (
     <nav className="relative z-50 bg-slate-900 border-b border-gray-200/50 dark:border-gray-700/50">
       <div className="container mx-auto px-6">
@@ -46,25 +48,28 @@ export default function Navbar() {
           )}
 
           {user ? (
-            <button
-              onClick={signOut}
-              className="inline-flex items-center px-4 py-2 bg-linear-to-r from-red-500 to-red-600 text-white text-sm font-medium rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg"
-            >
-              <svg
-                className="w-4 h-4 mr-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <div className="flex justify-between gap-3">
+              <ThemeToggle />
+              <Button
+                onClick={signOut}
+                className="inline-flex items-center px-4 py-2 bg-linear-to-r from-red-500 to-red-600 text-white text-sm font-medium rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-              Sign Out
-            </button>
+                <svg
+                  className="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+                Sign Out
+              </Button>
+            </div>
           ) : (
             <div className="flex justify-between gap-3">
               <ThemeToggle />

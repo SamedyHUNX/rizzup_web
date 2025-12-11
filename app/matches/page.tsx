@@ -6,13 +6,15 @@ import { useRouter } from "next/navigation";
 import MatchNotification from "@/components/match-notification";
 import MatchCard from "@/components/match-card";
 import MatchButtons from "@/components/match-buttons";
+import Loading from "@/components/loading";
 
 export default function MatchesPage() {
   const [potentialMatches, setPotentialMatches] = useState<UserProfile[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
 
-  const [showMatchNotification, setShowMatchNotification] = useState(false);
+  const [showMatchNotification, setShowMatchNotification] =
+    useState<boolean>(false);
   const [matchedUser, setMatchedUser] = useState<UserProfile | null>(null);
 
   const router = useRouter();
@@ -62,16 +64,7 @@ export default function MatchesPage() {
   function handleStartChat() {}
 
   if (loading) {
-    return (
-      <div className="h-full bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Finding your matches...
-          </p>
-        </div>
-      </div>
-    );
+    return <Loading message={"Finding your matches..."} />;
   }
 
   if (currentIndex >= potentialMatches.length) {
@@ -108,7 +101,7 @@ export default function MatchesPage() {
   const currentPotentialMatch = potentialMatches[currentIndex];
 
   return (
-    <div className="h-full overflow-y-auto bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen overflow-y-auto bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8">
           <div className="flex items-center justify-between mb-4">
