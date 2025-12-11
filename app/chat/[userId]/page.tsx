@@ -7,10 +7,13 @@ import { useAuth } from "@/contexts/auth-context";
 import { getUserMatches } from "@/lib/actions/matches";
 import { useParams, useRouter } from "next/navigation";
 import StreamChatInterface from "@/components/stream-chat-interface";
+import Loading from "@/components/loading";
+import { toast } from "sonner";
 
 export default function ChatConversationPage() {
   const [otherUser, setOtherUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
   const router = useRouter();
   const params = useParams();
 
@@ -23,6 +26,7 @@ export default function ChatConversationPage() {
   useEffect(() => {
     async function loadUserData() {
       try {
+        setError("");
         const userMatches = await getUserMatches();
         const matchedUser = userMatches.find((match) => match.id, userId);
 
@@ -31,8 +35,8 @@ export default function ChatConversationPage() {
         } else {
           router.push("/chat");
         }
-      } catch (error) {
-        router.push("/chat");
+      } catch (error: any) {
+        setError(error.message);
         console.error(error);
       } finally {
         setLoading(false);
@@ -44,17 +48,14 @@ export default function ChatConversationPage() {
     }
   }, [userId, router, user]);
 
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
   if (loading) {
-    return (
-      <div className="min-h-screen bg-linear-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Loading your matches...
-          </p>
-        </div>
-      </div>
-    );
+    return <Loading message="Loading your matches..." />;
   }
 
   if (!otherUser) {
